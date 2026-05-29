@@ -42,7 +42,7 @@ class RegisterPage extends StatelessWidget {
           AppButton(
             label: 'Create Account',
             onPressed: () {
-              context.go('/dashboard');
+              context.go('/app');
             },
           ),
 

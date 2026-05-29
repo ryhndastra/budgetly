@@ -31,7 +31,7 @@ class LoginPage extends StatelessWidget {
           AppButton(
             label: 'Sign In',
             onPressed: () {
-              context.go('/dashboard');
+              context.go('/app');
             },
           ),
 
