@@ -30,5 +30,6 @@ class AppTypography {
   static TextStyle labelLarge = GoogleFonts.plusJakartaSans(
     fontSize: 14,
     fontWeight: FontWeight.w600,
+    
   );
 }
