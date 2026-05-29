@@ -1,21 +1,34 @@
-import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/material.dart';
 
 class AppTypography {
-  static final titleLarge = GoogleFonts.plusJakartaSans(
-    fontSize: 24,
+  static TextStyle displayLarge = GoogleFonts.plusJakartaSans(
+    fontSize: 32,
     fontWeight: FontWeight.bold,
   );
 
-  static final titleMedium = GoogleFonts.plusJakartaSans(
+  static TextStyle headlineMedium = GoogleFonts.plusJakartaSans(
+    fontSize: 24,
+    fontWeight: FontWeight.w700,
+  );
+
+  static TextStyle titleLarge = GoogleFonts.plusJakartaSans(
     fontSize: 20,
     fontWeight: FontWeight.w600,
   );
 
-  static final bodyLarge = GoogleFonts.plusJakartaSans(
+  static TextStyle bodyLarge = GoogleFonts.plusJakartaSans(
     fontSize: 16,
     fontWeight: FontWeight.w500,
   );
 
-  static final bodyMedium = GoogleFonts.plusJakartaSans(fontSize: 14);
+  static TextStyle bodyMedium = GoogleFonts.plusJakartaSans(
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+  );
+
+  static TextStyle labelLarge = GoogleFonts.plusJakartaSans(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+  );
 }
