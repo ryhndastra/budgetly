@@ -1,48 +1,33 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/widgets/app_card.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/transaction_provider.dart';
+import '../../domain/enums/transaction_type.dart';
+import 'transaction_tile.dart';
 
-class TransactionList extends StatelessWidget {
+class TransactionList extends ConsumerWidget {
   const TransactionList({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final transactions = ref.watch(transactionProvider);
+
     return ListView.separated(
-      itemCount: 10,
+      itemCount: transactions.length,
 
       separatorBuilder: (_, _) => const SizedBox(height: 12),
 
       itemBuilder: (context, index) {
-        return AppCard(
-          child: Row(
-            children: [
-              CircleAvatar(
-                child: Icon(
-                  index.isEven ? Icons.arrow_downward : Icons.arrow_upward,
-                ),
-              ),
+        final transaction = transactions[index];
 
-              const SizedBox(width: 12),
+        return TransactionTile(
+          isIncome: transaction.type == TransactionType.income,
 
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(index.isEven ? 'Gaji Bulanan' : 'Makan Siang'),
+          title: transaction.title,
 
-                    const SizedBox(height: 4),
+          amount: transaction.amount,
 
-                    Text('Hari ini', style: TextStyle(color: Colors.grey)),
-                  ],
-                ),
-              ),
-
-              Text(
-                index.isEven ? '+ Rp 8.000.000' : '- Rp 45.000',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
+          date: 'Hari ini',
         );
       },
     );

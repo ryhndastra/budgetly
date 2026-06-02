@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_card.dart';
+import 'package:intl/intl.dart';
 
 class TransactionTile extends StatelessWidget {
   final bool isIncome;
   final String title;
-  final String amount;
+  final double amount;
   final String date;
 
   const TransactionTile({
@@ -19,6 +20,11 @@ class TransactionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currency = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    );
     return AppCard(
       child: Row(
         children: [
@@ -51,13 +57,7 @@ class TransactionTile extends StatelessWidget {
             ),
           ),
 
-          Text(
-            amount,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: isIncome ? AppColors.success : AppColors.danger,
-            ),
-          ),
+          Text(currency.format(amount)),
         ],
       ),
     );

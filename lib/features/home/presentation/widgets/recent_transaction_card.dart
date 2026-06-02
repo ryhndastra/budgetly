@@ -1,13 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
+import '../../../transaction/domain/enums/transaction_type.dart';
+import '../../../transaction/presentation/providers/transaction_provider.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_card.dart';
 
-class RecentTransactionCard extends StatelessWidget {
+class RecentTransactionCard extends ConsumerWidget {
   const RecentTransactionCard({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final transactions = ref.watch(transactionProvider).take(3).toList();
+
+    final currency = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    );
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -19,27 +30,27 @@ class RecentTransactionCard extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          _transaction(
-            icon: Icons.fastfood_rounded,
-            title: 'Makan Siang',
-            amount: '- Rp 45.000',
-          ),
+          ...List.generate(transactions.length, (index) {
+            final transaction = transactions[index];
 
-          Divider(color: AppColors.border),
+            return Column(
+              children: [
+                _transaction(
+                  icon: transaction.type == TransactionType.income
+                      ? Icons.payments_rounded
+                      : Icons.shopping_bag_rounded,
 
-          _transaction(
-            icon: Icons.coffee_rounded,
-            title: 'Kopi Kenangan',
-            amount: '- Rp 32.000',
-          ),
+                  title: transaction.title,
 
-          Divider(color: AppColors.border),
+                  amount:
+                      '${transaction.type == TransactionType.income ? '+' : '-'} ${currency.format(transaction.amount)}',
+                ),
 
-          _transaction(
-            icon: Icons.payments_rounded,
-            title: 'Gaji Bulanan',
-            amount: '+ Rp 8.000.000',
-          ),
+                if (index != transactions.length - 1)
+                  Divider(color: AppColors.border),
+              ],
+            );
+          }),
         ],
       ),
     );

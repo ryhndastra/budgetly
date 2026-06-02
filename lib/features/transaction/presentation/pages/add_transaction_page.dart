@@ -1,24 +1,78 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../../domain/enums/transaction_type.dart';
+import '../../domain/entities/transaction.dart';
+import '../providers/transaction_provider.dart';
 
-class AddTransactionPage extends StatefulWidget {
+class AddTransactionPage extends ConsumerStatefulWidget {
   final TransactionType type;
+
   const AddTransactionPage({super.key, required this.type});
 
   @override
-  State<AddTransactionPage> createState() => _AddTransactionPageState();
+  ConsumerState<AddTransactionPage> createState() => _AddTransactionPageState();
 }
 
-class _AddTransactionPageState extends State<AddTransactionPage> {
+class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
   final _amountController = TextEditingController();
   final _titleController = TextEditingController();
   final _noteController = TextEditingController();
-  String _selectedCategory = 'Makanan';
+  String _selectedCategory = '';
+
+  double _parseAmount() {
+    final raw = _amountController.text.replaceAll(RegExp(r'[^0-9]'), '');
+
+    if (raw.isEmpty) return 0;
+
+    return double.parse(raw);
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+    );
+  }
+
+  void _saveTransaction() {
+    final amount = _parseAmount();
+
+    if (_titleController.text.trim().isEmpty) {
+      _showError('Nama transaksi wajib diisi');
+      return;
+    }
+
+    if (amount <= 0) {
+      _showError('Nominal harus lebih dari Rp 0');
+      return;
+    }
+
+    final transaction = Transaction(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+
+      title: _titleController.text.trim(),
+
+      amount: amount,
+
+      category: _selectedCategory,
+
+      note: _noteController.text.trim().isEmpty
+          ? null
+          : _noteController.text.trim(),
+
+      type: widget.type,
+
+      createdAt: DateTime.now(),
+    );
+
+    ref.read(transactionProvider.notifier).addTransaction(transaction);
+
+    Navigator.pop(context);
+  }
 
   final _currencyFormatter = NumberFormat.currency(
     locale: 'id_ID',
@@ -51,7 +105,12 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   @override
   void initState() {
     super.initState();
+
     _amountController.addListener(_formatAmount);
+
+    _selectedCategory = widget.type == TransactionType.income
+        ? 'Gaji'
+        : 'Makanan';
   }
 
   @override
@@ -83,7 +142,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
         child: AppButton(
           label: isIncome ? 'Simpan Pemasukan' : 'Simpan Pengeluaran',
           icon: Icons.check,
-          onPressed: () {},
+          onPressed: _saveTransaction,
         ),
       ),
 
@@ -133,7 +192,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 36),
 
             AppTextField(

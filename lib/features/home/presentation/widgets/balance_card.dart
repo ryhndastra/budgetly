@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class BalanceCard extends StatelessWidget {
-  const BalanceCard({super.key});
+  final String balance;
+
+  const BalanceCard({super.key, required this.balance});
 
   @override
   Widget build(BuildContext context) {
@@ -15,34 +17,38 @@ class BalanceCard extends StatelessWidget {
           colors: [Color(0xFF0A5568), Color(0xFF0F738D)],
         ),
       ),
-      child: const Padding(
-        padding: EdgeInsets.all(24),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Saldo Total', style: TextStyle(color: Colors.white70)),
+            const Text('Saldo Total', style: TextStyle(color: Colors.white70)),
 
-            Spacer(),
+            const Spacer(),
 
             Text(
-              'Rp 12.500.000',
-              style: TextStyle(
+              balance,
+              style: const TextStyle(
                 fontSize: 34,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
               ),
             ),
 
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
 
-            Row(
+            const Row(
               children: [
-                Icon(Icons.trending_up, size: 18, color: Colors.white),
+                Icon(
+                  Icons.account_balance_wallet_outlined,
+                  size: 18,
+                  color: Colors.white,
+                ),
 
                 SizedBox(width: 6),
 
                 Text(
-                  'Naik 12% bulan ini',
+                  'Dihitung dari transaksi',
                   style: TextStyle(color: Colors.white),
                 ),
               ],
