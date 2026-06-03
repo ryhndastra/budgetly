@@ -69,7 +69,7 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
 
       amount: amount,
 
-      category: _selectedCategory,
+      categoryId: _selectedCategory,
 
       note: _noteController.text.trim().isEmpty
           ? null

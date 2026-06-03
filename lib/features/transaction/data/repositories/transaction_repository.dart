@@ -1,13 +1,14 @@
 import '../../domain/entities/transaction.dart';
+import '../services/transaction_api_service.dart';
 
 class TransactionRepository {
-  final List<Transaction> _transactions = [];
+  final TransactionApiService api;
 
-  List<Transaction> getAll() {
-    return _transactions;
-  }
+  TransactionRepository(this.api);
 
-  void add(Transaction transaction) {
-    _transactions.insert(0, transaction);
+  Future<List<Transaction>> getAll(String userId) async {
+    final data = await api.getTransactions(userId);
+
+    return data.map<Transaction>((json) => Transaction.fromJson(json)).toList();
   }
 }

@@ -7,7 +7,7 @@ class TransactionService {
   Transaction createTransaction({
     required String title,
     required double amount,
-    required String category,
+    required String categoryId,
     String? note,
     required TransactionType type,
   }) {
@@ -15,7 +15,7 @@ class TransactionService {
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: title,
       amount: amount,
-      category: category,
+      categoryId: categoryId,
       note: note,
       type: type,
       createdAt: DateTime.now(),
