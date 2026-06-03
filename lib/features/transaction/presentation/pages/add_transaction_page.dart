@@ -6,8 +6,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
+import '../../../category/presentation/providers/category_provider.dart';
 import '../../domain/enums/transaction_type.dart';
-import '../../domain/entities/transaction.dart';
 import '../providers/transaction_provider.dart';
 
 class AddTransactionPage extends ConsumerStatefulWidget {
@@ -49,7 +49,7 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
     );
   }
 
-  void _saveTransaction() {
+  Future<void> _saveTransaction() async {
     final amount = _parseAmount();
 
     if (_titleController.text.trim().isEmpty) {
@@ -62,31 +62,38 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
       return;
     }
 
-    final transaction = Transaction(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+    try {
+      await ref
+          .read(transactionRepositoryProvider)
+          .create(
+            userId: 'aa2dcca5-f2bd-415e-8547-35fcd992db6c',
+            categoryId: _selectedCategory,
+            title: _titleController.text.trim(),
+            amount: amount,
+            note: _noteController.text.trim().isEmpty
+                ? null
+                : _noteController.text.trim(),
+            type: widget.type.name,
+          );
+          
+      await ref
+          .read(transactionProvider.notifier)
+          .loadTransactions('aa2dcca5-f2bd-415e-8547-35fcd992db6c');
 
-      title: _titleController.text.trim(),
+      if (!mounted) return;
 
-      amount: amount,
+      _showSuccess(
+        widget.type == TransactionType.income
+            ? 'Pemasukan berhasil ditambahkan'
+            : 'Pengeluaran berhasil ditambahkan',
+      );
 
-      categoryId: _selectedCategory,
+      context.pop(true);
+    } catch (e) {
+      if (!mounted) return;
 
-      note: _noteController.text.trim().isEmpty
-          ? null
-          : _noteController.text.trim(),
-
-      type: widget.type,
-
-      createdAt: DateTime.now(),
-    );
-
-    ref.read(transactionProvider.notifier).addTransaction(transaction);
-
-    _showSuccess(
-      widget.type == TransactionType.income
-          ? 'Pemasukan berhasil ditambahkan'
-          : 'Pengeluaran berhasil ditambahkan',
-    );
+      _showError('Gagal menyimpan transaksi');
+    }
 
     context.pop(true);
   }
@@ -143,12 +150,17 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final categoriesAsync = ref.watch(categoriesProvider);
     final isIncome = widget.type == TransactionType.income;
 
-    final categories = isIncome
-        ? const ['Gaji', 'Freelance', 'Bonus', 'Investasi']
-        : const ['Makanan', 'Transport', 'Belanja', 'Tagihan'];
-
+    final categories = categoriesAsync.maybeWhen(
+      data: (data) => data
+          .where(
+            (category) => category.type == (isIncome ? 'income' : 'expense'),
+          )
+          .toList(),
+      orElse: () => [],
+    );
     return Scaffold(
       appBar: AppBar(
         title: Text(isIncome ? 'Tambah Pemasukan' : 'Tambah Pengeluaran'),
@@ -233,16 +245,16 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
               spacing: 8,
               runSpacing: 8,
               children: categories.map((category) {
-                final selected = _selectedCategory == category;
+                final selected = _selectedCategory == category.id;
 
                 return ChoiceChip(
-                  label: Text(category),
+                  label: Text(category.name),
 
                   selected: selected,
 
                   onSelected: (_) {
                     setState(() {
-                      _selectedCategory = category;
+                      _selectedCategory = category.id;
                     });
                   },
 

@@ -11,4 +11,22 @@ class TransactionRepository {
 
     return data.map<Transaction>((json) => Transaction.fromJson(json)).toList();
   }
+
+  Future<void> create({
+    required String userId,
+    required String categoryId,
+    required String title,
+    required double amount,
+    String? note,
+    required String type,
+  }) {
+    return api.createTransaction(
+      userId: userId,
+      categoryId: categoryId,
+      title: title,
+      amount: amount,
+      note: note,
+      type: type,
+    );
+  }
 }

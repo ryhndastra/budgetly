@@ -11,4 +11,34 @@ class TransactionApiService {
 
     return response.data;
   }
+
+  Future<List<dynamic>> getCategories(String userId) async {
+    final response = await _dio.get(
+      '/categories',
+      queryParameters: {'user_id': userId},
+    );
+
+    return response.data;
+  }
+
+  Future<void> createTransaction({
+    required String userId,
+    required String categoryId,
+    required String title,
+    required double amount,
+    String? note,
+    required String type,
+  }) async {
+    await _dio.post(
+      '/transactions/',
+      data: {
+        'user_id': userId,
+        'category_id': categoryId,
+        'title': title,
+        'amount': amount,
+        'note': note,
+        'type': type,
+      },
+    );
+  }
 }
