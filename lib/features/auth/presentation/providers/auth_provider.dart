@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/repositories/auth_repository.dart';
@@ -12,6 +14,8 @@ final authRepositoryProvider = Provider<AuthRepository>(
   (ref) => AuthRepository(ref.read(authApiServiceProvider)),
 );
 
+const _userKey = 'current_user';
+
 class AuthNotifier extends StateNotifier<User?> {
   final AuthRepository repository;
 
@@ -21,6 +25,8 @@ class AuthNotifier extends StateNotifier<User?> {
     final user = await repository.login(email: email, password: password);
 
     state = user;
+
+    await _saveUser(user);
   }
 
   Future<void> register({
@@ -35,6 +41,34 @@ class AuthNotifier extends StateNotifier<User?> {
     );
 
     state = user;
+
+    await _saveUser(user);
+  }
+
+  Future<void> loadUser() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final jsonString = prefs.getString(_userKey);
+
+    if (jsonString == null) {
+      return;
+    }
+
+    state = User.fromJson(jsonDecode(jsonString));
+  }
+
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.remove(_userKey);
+
+    state = null;
+  }
+
+  Future<void> _saveUser(User user) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setString(_userKey, jsonEncode(user.toJson()));
   }
 }
 
