@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 
 import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
@@ -62,11 +63,18 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
       return;
     }
 
+    final user = ref.read(authProvider);
+
+    if (user == null) {
+      _showError('User tidak ditemukan');
+      return;
+    }
+
     try {
       await ref
           .read(transactionRepositoryProvider)
           .create(
-            userId: 'aa2dcca5-f2bd-415e-8547-35fcd992db6c',
+            userId: user.id,
             categoryId: _selectedCategory,
             title: _titleController.text.trim(),
             amount: amount,
@@ -75,10 +83,8 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
                 : _noteController.text.trim(),
             type: widget.type.name,
           );
-          
-      await ref
-          .read(transactionProvider.notifier)
-          .loadTransactions('aa2dcca5-f2bd-415e-8547-35fcd992db6c');
+
+      await ref.read(transactionProvider.notifier).loadTransactions(user.id);
 
       if (!mounted) return;
 

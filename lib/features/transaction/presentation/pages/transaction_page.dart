@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/transaction_provider.dart';
 import '../widgets/add_transaction_sheet.dart';
 import '../widgets/transaction_list.dart';
@@ -18,9 +19,11 @@ class _TransactionPageState extends ConsumerState<TransactionPage> {
     super.initState();
 
     Future.microtask(() {
-      ref
-          .read(transactionProvider.notifier)
-          .loadTransactions('aa2dcca5-f2bd-415e-8547-35fcd992db6c');
+      final user = ref.read(authProvider);
+
+      if (user == null) return;
+
+      ref.read(transactionProvider.notifier).loadTransactions(user.id);
     });
   }
 
