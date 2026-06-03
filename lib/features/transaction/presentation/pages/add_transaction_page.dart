@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_text_field.dart';
@@ -23,6 +24,16 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
   final _titleController = TextEditingController();
   final _noteController = TextEditingController();
   String _selectedCategory = '';
+
+  void _showSuccess(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.success,
+      ),
+    );
+  }
 
   double _parseAmount() {
     final raw = _amountController.text.replaceAll(RegExp(r'[^0-9]'), '');
@@ -71,7 +82,13 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
 
     ref.read(transactionProvider.notifier).addTransaction(transaction);
 
-    Navigator.pop(context);
+    _showSuccess(
+      widget.type == TransactionType.income
+          ? 'Pemasukan berhasil ditambahkan'
+          : 'Pengeluaran berhasil ditambahkan',
+    );
+
+    context.pop(true);
   }
 
   final _currencyFormatter = NumberFormat.currency(

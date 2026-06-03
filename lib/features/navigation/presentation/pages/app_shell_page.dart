@@ -14,18 +14,16 @@ class AppShellPage extends StatefulWidget {
 class _AppShellPageState extends State<AppShellPage> {
   int _currentIndex = 0;
 
-  final _pages = const [
-    HomePage(),
-    TransactionPage(),
-    Center(child: Text('Anggaran')),
-    Center(child: Text('Target')),
-    Center(child: Text('Profil')),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_currentIndex],
+      body: switch (_currentIndex) {
+        0 => const HomePage(),
+        1 => const TransactionPage(),
+        2 => const Center(child: Text('Anggaran')),
+        3 => const Center(child: Text('Target')),
+        _ => const Center(child: Text('Profil')),
+      },
 
       bottomNavigationBar: AppBottomNavbar(
         currentIndex: _currentIndex,
