@@ -11,4 +11,18 @@ class AuthRepository {
 
     return User.fromJson(data);
   }
+
+  Future<User> register({
+    required String fullName,
+    required String email,
+    required String password,
+  }) async {
+    final data = await api.register(
+      fullName: fullName,
+      email: email,
+      password: password,
+    );
+
+    return User.fromJson(data);
+  }
 }

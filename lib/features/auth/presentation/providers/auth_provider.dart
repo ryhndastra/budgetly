@@ -22,6 +22,20 @@ class AuthNotifier extends StateNotifier<User?> {
 
     state = user;
   }
+
+  Future<void> register({
+    required String fullName,
+    required String email,
+    required String password,
+  }) async {
+    final user = await repository.register(
+      fullName: fullName,
+      email: email,
+      password: password,
+    );
+
+    state = user;
+  }
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, User?>(

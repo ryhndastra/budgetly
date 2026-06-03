@@ -14,4 +14,17 @@ class AuthApiService {
 
     return response.data;
   }
+
+  Future<Map<String, dynamic>> register({
+    required String fullName,
+    required String email,
+    required String password,
+  }) async {
+    final response = await _dio.post(
+      '/auth/register',
+      data: {'full_name': fullName, 'email': email, 'password': password},
+    );
+
+    return response.data;
+  }
 }
