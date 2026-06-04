@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/widgets/app_bottom_navbar.dart';
 import '../../../home/presentation/pages/home_page.dart';
 import '../../../transaction/presentation/pages/transaction_page.dart';
+import '../../../profile/presentation/pages/profile_page.dart';
 
 class AppShellPage extends StatefulWidget {
   const AppShellPage({super.key});
@@ -22,7 +23,7 @@ class _AppShellPageState extends State<AppShellPage> {
         1 => const TransactionPage(),
         2 => const Center(child: Text('Anggaran')),
         3 => const Center(child: Text('Target')),
-        _ => const Center(child: Text('Profil')),
+        _ => const ProfilePage(),
       },
 
       bottomNavigationBar: AppBottomNavbar(

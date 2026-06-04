@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../transaction/domain/enums/transaction_type.dart';
 import '../../../transaction/presentation/providers/transaction_provider.dart';
 import '../widgets/balance_card.dart';
@@ -16,6 +17,7 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final transactions = ref.watch(transactionProvider);
+    final user = ref.watch(authProvider);
 
     final income = transactions
         .where((t) => t.type == TransactionType.income)
@@ -39,7 +41,7 @@ class HomePage extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Halo, Sho',
+              'Halo, ${user?.fullName ?? 'User'}',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
 
