@@ -41,4 +41,28 @@ class TransactionApiService {
       },
     );
   }
+
+  Future<void> updateTransaction({
+    required String transactionId,
+    required String categoryId,
+    required String title,
+    required double amount,
+    String? note,
+    required String type,
+  }) async {
+    await _dio.put(
+      '/transactions/$transactionId',
+      data: {
+        'category_id': categoryId,
+        'title': title,
+        'amount': amount,
+        'note': note,
+        'type': type,
+      },
+    );
+  }
+
+  Future<void> deleteTransaction(String transactionId) async {
+    await _dio.delete('/transactions/$transactionId');
+  }
 }

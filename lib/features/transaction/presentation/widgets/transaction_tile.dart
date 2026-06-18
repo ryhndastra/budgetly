@@ -10,12 +10,17 @@ class TransactionTile extends StatelessWidget {
   final double amount;
   final String date;
 
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+
   const TransactionTile({
     super.key,
     required this.isIncome,
     required this.title,
     required this.amount,
     required this.date,
+    this.onTap,
+    this.onLongPress,
   });
 
   @override
@@ -25,40 +30,44 @@ class TransactionTile extends StatelessWidget {
       symbol: 'Rp ',
       decimalDigits: 0,
     );
-    return AppCard(
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: isIncome
-                ? AppColors.success.withValues(alpha: 0.15)
-                : AppColors.danger.withValues(alpha: 0.15),
 
-            child: Icon(
-              isIncome ? Icons.south_rounded : Icons.north_rounded,
-              color: isIncome ? AppColors.success : AppColors.danger,
+    return GestureDetector(
+      onTap: onTap,
+      onLongPress: onLongPress,
+      child: AppCard(
+        child: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: isIncome
+                  ? AppColors.success.withValues(alpha: 0.15)
+                  : AppColors.danger.withValues(alpha: 0.15),
+              child: Icon(
+                isIncome ? Icons.south_rounded : Icons.north_rounded,
+                color: isIncome ? AppColors.success : AppColors.danger,
+              ),
             ),
-          ),
 
-          const SizedBox(width: 12),
+            const SizedBox(width: 12),
 
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
-                ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
 
-                const SizedBox(height: 4),
+                  const SizedBox(height: 4),
 
-                Text(date),
-              ],
+                  Text(date),
+                ],
+              ),
             ),
-          ),
 
-          Text(currency.format(amount)),
-        ],
+            Text(currency.format(amount)),
+          ],
+        ),
       ),
     );
   }

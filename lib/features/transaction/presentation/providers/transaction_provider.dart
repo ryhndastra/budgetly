@@ -21,6 +21,36 @@ class TransactionNotifier extends StateNotifier<List<Transaction>> {
     state = await repository.getAll(userId);
   }
 
+  Future<void> deleteTransaction({
+    required String transactionId,
+    required String userId,
+  }) async {
+    await repository.delete(transactionId);
+
+    await loadTransactions(userId);
+  }
+
+  Future<void> updateTransaction({
+    required String userId,
+    required String transactionId,
+    required String categoryId,
+    required String title,
+    required double amount,
+    String? note,
+    required String type,
+  }) async {
+    await repository.update(
+      transactionId: transactionId,
+      categoryId: categoryId,
+      title: title,
+      amount: amount,
+      note: note,
+      type: type,
+    );
+
+    await loadTransactions(userId);
+  }
+
   void addTransaction(Transaction transaction) {
     state = [transaction, ...state];
   }

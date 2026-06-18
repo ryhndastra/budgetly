@@ -29,4 +29,26 @@ class TransactionRepository {
       type: type,
     );
   }
+
+  Future<void> delete(String transactionId) async {
+    await api.deleteTransaction(transactionId);
+  }
+
+  Future<void> update({
+    required String transactionId,
+    required String categoryId,
+    required String title,
+    required double amount,
+    String? note,
+    required String type,
+  }) {
+    return api.updateTransaction(
+      transactionId: transactionId,
+      categoryId: categoryId,
+      title: title,
+      amount: amount,
+      note: note,
+      type: type,
+    );
+  }
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../auth/presentation/providers/auth_provider.dart';
 
+import '../../domain/entities/transaction.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_button.dart';
@@ -13,8 +14,9 @@ import '../providers/transaction_provider.dart';
 
 class AddTransactionPage extends ConsumerStatefulWidget {
   final TransactionType type;
+  final Transaction? transaction;
 
-  const AddTransactionPage({super.key, required this.type});
+  const AddTransactionPage({super.key, required this.type, this.transaction});
 
   @override
   ConsumerState<AddTransactionPage> createState() => _AddTransactionPageState();
@@ -24,6 +26,7 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
   final _amountController = TextEditingController();
   final _titleController = TextEditingController();
   final _noteController = TextEditingController();
+  bool get isEdit => widget.transaction != null;
   String _selectedCategory = '';
 
   void _showSuccess(String message) {
@@ -71,37 +74,57 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
     }
 
     try {
-      await ref
-          .read(transactionRepositoryProvider)
-          .create(
-            userId: user.id,
-            categoryId: _selectedCategory,
-            title: _titleController.text.trim(),
-            amount: amount,
-            note: _noteController.text.trim().isEmpty
-                ? null
-                : _noteController.text.trim(),
-            type: widget.type.name,
-          );
+      if (isEdit) {
+        await ref
+            .read(transactionProvider.notifier)
+            .updateTransaction(
+              userId: user.id,
+              transactionId: widget.transaction!.id,
+              categoryId: _selectedCategory,
+              title: _titleController.text.trim(),
+              amount: amount,
+              note: _noteController.text.trim().isEmpty
+                  ? null
+                  : _noteController.text.trim(),
+              type: widget.type.name,
+            );
 
-      await ref.read(transactionProvider.notifier).loadTransactions(user.id);
+        if (!mounted) return;
 
-      if (!mounted) return;
+        _showSuccess('Transaksi berhasil diperbarui');
+      } else {
+        await ref
+            .read(transactionRepositoryProvider)
+            .create(
+              userId: user.id,
+              categoryId: _selectedCategory,
+              title: _titleController.text.trim(),
+              amount: amount,
+              note: _noteController.text.trim().isEmpty
+                  ? null
+                  : _noteController.text.trim(),
+              type: widget.type.name,
+            );
 
-      _showSuccess(
-        widget.type == TransactionType.income
-            ? 'Pemasukan berhasil ditambahkan'
-            : 'Pengeluaran berhasil ditambahkan',
-      );
+        await ref.read(transactionProvider.notifier).loadTransactions(user.id);
+
+        if (!mounted) return;
+
+        _showSuccess(
+          widget.type == TransactionType.income
+              ? 'Pemasukan berhasil ditambahkan'
+              : 'Pengeluaran berhasil ditambahkan',
+        );
+      }
 
       context.pop(true);
     } catch (e) {
       if (!mounted) return;
 
-      _showError('Gagal menyimpan transaksi');
+      _showError(
+        isEdit ? 'Gagal memperbarui transaksi' : 'Gagal menyimpan transaksi',
+      );
     }
-
-    context.pop(true);
   }
 
   final _currencyFormatter = NumberFormat.currency(
@@ -138,9 +161,17 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
 
     _amountController.addListener(_formatAmount);
 
-    _selectedCategory = widget.type == TransactionType.income
-        ? 'Gaji'
-        : 'Makanan';
+    if (widget.transaction != null) {
+      final transaction = widget.transaction!;
+
+      _titleController.text = transaction.title;
+
+      _noteController.text = transaction.note ?? '';
+
+      _selectedCategory = transaction.categoryId;
+
+      _amountController.text = _currencyFormatter.format(transaction.amount);
+    }
   }
 
   @override
@@ -169,13 +200,23 @@ class _AddTransactionPageState extends ConsumerState<AddTransactionPage> {
     );
     return Scaffold(
       appBar: AppBar(
-        title: Text(isIncome ? 'Tambah Pemasukan' : 'Tambah Pengeluaran'),
+        title: Text(
+          isEdit
+              ? 'Edit Transaksi'
+              : isIncome
+              ? 'Tambah Pemasukan'
+              : 'Tambah Pengeluaran',
+        ),
       ),
 
       bottomNavigationBar: SafeArea(
         minimum: const EdgeInsets.all(24),
         child: AppButton(
-          label: isIncome ? 'Simpan Pemasukan' : 'Simpan Pengeluaran',
+          label: isEdit
+              ? 'Update Transaksi'
+              : isIncome
+              ? 'Simpan Pemasukan'
+              : 'Simpan Pengeluaran',
           icon: Icons.check,
           onPressed: _saveTransaction,
         ),
