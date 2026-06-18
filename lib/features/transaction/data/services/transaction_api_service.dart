@@ -21,6 +21,42 @@ class TransactionApiService {
     return response.data;
   }
 
+  Future<void> createCategory({
+    required String userId,
+    required String name,
+    required String icon,
+    required String color,
+    required String type,
+  }) async {
+    await _dio.post(
+      '/categories/',
+      data: {
+        'user_id': userId,
+        'name': name,
+        'icon': icon,
+        'color': color,
+        'type': type,
+      },
+    );
+  }
+
+  Future<void> updateCategory({
+    required String categoryId,
+    required String name,
+    required String icon,
+    required String color,
+    required String type,
+  }) async {
+    await _dio.put(
+      '/categories/$categoryId',
+      data: {'name': name, 'icon': icon, 'color': color, 'type': type},
+    );
+  }
+
+  Future<void> deleteCategory(String categoryId) async {
+    await _dio.delete('/categories/$categoryId');
+  }
+
   Future<void> createTransaction({
     required String userId,
     required String categoryId,

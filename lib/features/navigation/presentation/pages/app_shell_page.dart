@@ -1,19 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../../transaction/presentation/providers/transaction_provider.dart';
+import '../../../category/presentation/providers/category_provider.dart';
 import '../../../../core/widgets/app_bottom_navbar.dart';
 import '../../../home/presentation/pages/home_page.dart';
 import '../../../transaction/presentation/pages/transaction_page.dart';
 import '../../../profile/presentation/pages/profile_page.dart';
 
-class AppShellPage extends StatefulWidget {
+class AppShellPage extends ConsumerStatefulWidget {
   const AppShellPage({super.key});
 
   @override
-  State<AppShellPage> createState() => _AppShellPageState();
+  ConsumerState<AppShellPage> createState() => _AppShellPageState();
 }
 
-class _AppShellPageState extends State<AppShellPage> {
+class _AppShellPageState extends ConsumerState<AppShellPage> {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() async {
+      final user = ref.read(authProvider);
+
+      if (user == null) return;
+
+      await ref.read(transactionProvider.notifier).loadTransactions(user.id);
+
+      await ref.read(categoryProvider.notifier).loadCategories(user.id);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

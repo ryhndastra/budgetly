@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../category/presentation/pages/category_page.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
 
 class ProfilePage extends ConsumerWidget {
@@ -27,6 +28,20 @@ class ProfilePage extends ConsumerWidget {
             Text(user?.email ?? ''),
 
             const SizedBox(height: 32),
+
+            ListTile(
+              leading: const Icon(Icons.category_outlined),
+              title: const Text('Kelola Kategori'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const CategoryPage()),
+                );
+              },
+            ),
+
+            const SizedBox(height: 12),
 
             FilledButton(
               onPressed: () async {
