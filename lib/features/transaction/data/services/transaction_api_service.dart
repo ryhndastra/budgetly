@@ -98,6 +98,37 @@ class TransactionApiService {
     );
   }
 
+  Future<List<dynamic>> getBudgets(String userId) async {
+    final response = await _dio.get(
+      '/budgets',
+      queryParameters: {'user_id': userId},
+    );
+
+    return response.data;
+  }
+
+  Future<void> createBudget({
+    required String userId,
+    required String categoryId,
+    required double amount,
+  }) async {
+    await _dio.post(
+      '/budgets/',
+      data: {'user_id': userId, 'category_id': categoryId, 'amount': amount},
+    );
+  }
+
+  Future<void> updateBudget({
+    required String budgetId,
+    required double amount,
+  }) async {
+    await _dio.put('/budgets/$budgetId', data: {'amount': amount});
+  }
+
+  Future<void> deleteBudget(String budgetId) async {
+    await _dio.delete('/budgets/$budgetId');
+  }
+
   Future<void> deleteTransaction(String transactionId) async {
     await _dio.delete('/transactions/$transactionId');
   }
